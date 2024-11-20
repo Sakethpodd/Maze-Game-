@@ -1,0 +1,76 @@
+'''
+Maze Runner is a simple puzzle game where the player navigates through a grid-based maze to reach the exit. 
+Use the arrow keys to move the red square (player) through white tiles while avoiding black walls. 
+The goal is to reach the green square (exit) to win the game
+'''
+import tkinter as tk
+from tkinter import messagebox
+
+Tile_Size = 40
+maze = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+    [1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+    [1, 0, 1, 1, 1, 1, 0, 1, 0, 1], # Constants
+    [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+    [1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+]
+
+Rows, Cols = len(maze), len(maze[0])
+
+player_pos = [1, 1] # Player and exit positions
+exit_pos = [8, 8]
+
+def move_player(event): # Movement based on keys
+    global player_pos
+    new_pos = player_pos.copy()
+
+    if event.keysym == 'Up':
+        new_pos[0] -= 1
+    elif event.keysym == 'Down':
+        new_pos[0] += 1
+    elif event.keysym == 'Left':
+        new_pos[1] -= 1
+    elif event.keysym == 'Right':
+        new_pos[1] += 1
+
+    if maze[new_pos[0]][new_pos[1]] == 0:     # Checks if move is within bounds and not a wall
+        player_pos = new_pos
+        draw_maze()
+        check_exit()
+
+def check_exit():  # Check if player has reached the exit
+    if player_pos == exit_pos:
+        messagebox.showinfo('Congratulations', "You've reached the end!")
+        root.quit()
+
+def draw_maze(): # Draw the maze, player, and exit
+    canvas.delete('all')
+    for row in range(Rows):
+        for col in range(Cols):
+            color = 'black' if maze[row][col] == 1 else 'white'
+            x1, y1 = col * Tile_Size, row * Tile_Size
+            x2, y2 = x1 + Tile_Size, y1 + Tile_Size
+            canvas.create_rectangle(x1, y1, x2, y2, fill=color)
+
+    px, py = player_pos[1] * Tile_Size, player_pos[0] * Tile_Size     # Draw player
+    canvas.create_rectangle(px, py, px + Tile_Size, py + Tile_Size, fill='red') 
+
+    ex, ey = exit_pos[1] * Tile_Size, exit_pos[0] * Tile_Size     # Draw exit
+    canvas.create_rectangle(ex, ey, ex + Tile_Size, ey + Tile_Size, fill='green')
+
+root = tk.Tk() # Initialize Tkinter window
+root.title('Simple Maze Game')
+
+canvas = tk.Canvas(root, width=Cols * Tile_Size, height=Rows * Tile_Size)
+canvas.pack()
+
+root.bind('<KeyPress>', move_player)
+
+draw_maze()
+
+root.mainloop() # Run the game loop
